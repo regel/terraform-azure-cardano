@@ -1,0 +1,3 @@
+## NOTE: About [/modules](https://github.com/regel/terraform-azure-cardano/tree/main/modules) and [/examples](https://github.com/regel/terraform-azure-cardano/tree/main/examples)
+
+HashiCorp's Terraform Registry requires every repo to have a `main.tf` in its root dir. The code is broken down into multiple sub-modules, so they can't all be in the root dir [/](https://github.com/regel/terraform-azure-cardano/tree/main). Therefore, sub-modules are in the [/modules](https://github.com/regel/terraform-azure-cardano/tree/main/modules) subdirectory, the example code is in the [/examples](https://github.com/regel/terraform-azure-cardano/tree/main/examples) subdirectory
