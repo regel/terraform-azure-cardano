@@ -44,6 +44,12 @@ a version number bump.
 * [cluster](https://github.com/regel/terraform-azure-cardano/tree/main/modules/cluster): This module installs a Kubernetes cluster in Azure and network security plugins
 * [helm-cardano](https://github.com/regel/terraform-azure-cardano/tree/main/modules/helm-cardano): This module installs Kubernetes Helm releases
 
+
+## How do I contribute to this Module?
+
+Contributions are very welcome! Check out the [Contribution Guidelines](./CONTRIBUTING.md) for instructions.
+
+
 ## How is this Module versioned?
 
 This Module follows the principles of [Semantic Versioning](http://semver.org/). You can find each new release, 
