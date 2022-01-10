@@ -37,13 +37,6 @@ resource "random_string" "number" {
 resource "azurerm_resource_group" "rg" {
   name     = coalesce(var.resource_group_name, random_pet.example.id)
   location = var.location
-  tags = [
-    {
-      key                 = "Environment"
-      value               = "testnet"
-      propagate_at_launch = true
-    }
-  ]
 }
 
 resource "tls_private_key" "id_rsa" {
@@ -70,13 +63,9 @@ module "cardano_cluster" {
   user_node_pool_node_count   = 1
   user_node_pool_vm_size      = "Standard_E4s_v4"
 
-  tags = [
-    {
-      key                 = "Environment"
-      value               = "testnet"
-      propagate_at_launch = true
-    }
-  ]
+  tags = {
+    Environment = "testnet"
+  }
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -91,7 +80,7 @@ module "containers" {
 
   release_name                       = coalesce(var.release_name, random_pet.example.id)
   namespace                          = "testnet"
-  tenant_id                          = azurerm_client_config.current.tenant_id
+  tenant_id                          = data.azurerm_client_config.current.tenant_id
   dns_label_name                     = coalesce(var.domain_name_label, random_pet.example.id)
   environment                        = "testnet"
   pvc_size                           = "32Gi"
@@ -99,6 +88,7 @@ module "containers" {
   pvc_source_guid                    = "13ioPLPad3auIcBZgp5jJeukJcnq9_cTj"
   cardano_helm_version               = "0.1.3"
   cardano_image_version              = "1.30.1"
+  identity                           = module.cardano_cluster.kubelet_client_id
   csi_secrets_store_provider_enabled = true
   vault_name                         = var.vault_name
   prometheus_enabled                 = true
@@ -114,10 +104,10 @@ module "vault" {
   vault_name           = var.vault_name
   location             = var.location
   resource_group_name  = var.vault_resource_group_name
-  tenant_id            = azurerm_client_config.current.tenant_id
-  allow_subnet_ids     = [data.module.cardano_cluster.user_subnet_id]
-  cluster_principal_id = data.module.cardano_cluster.cluster_principal_id
-  kubelet_principal_id = data.module.cardano_cluster.kubelet_principal_id
+  tenant_id            = data.azurerm_client_config.current.tenant_id
+  allow_subnet_ids     = [module.cardano_cluster.user_subnet_id]
+  cluster_principal_id = module.cardano_cluster.cluster_principal_id
+  kubelet_principal_id = module.cardano_cluster.kubelet_principal_id
   sku_name             = "standard"
   allow_cidrs          = ["${chomp(data.http.myip.body)}/32"]
   allow_azuread_group  = false
