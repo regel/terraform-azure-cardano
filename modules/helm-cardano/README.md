@@ -12,7 +12,7 @@ code by adding a `module` configuration and setting its `source` parameter to UR
 ```hcl
 module "helm-cardano" {
   # TODO: update this to the final URL
-  source = "github.com/regel/terraform-azure-cardano//modules/helm?ref=v0.0.5"
+  source = "github.com/regel/terraform-azure-cardano//modules/helm-cardano?ref=v0.0.5"
 
 
   # ... See variables.tf for the other parameters you must define for the module
