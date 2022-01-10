@@ -17,6 +17,11 @@ variable "vault_name" {
   type        = string
 }
 
+variable "vault_resource_group_name" {
+  type        = string
+  description = "The name of the resource group in which to create Azure Key Vault resources. This resource group can differ from the main resource group. This is typically the case if you have a previously deployed (perhaps centrally controlled) Key Vault and Secrets."
+}
+
 # ---------------------------------------------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
 # These parameters have reasonable defaults.
@@ -24,7 +29,7 @@ variable "vault_name" {
 
 variable "resource_group_name" {
   type        = string
-  description = "The name of the resource group in which to create cluster resources."
+  description = "The name of the resource group in which to create resources."
   default     = "testnet-rg"
 }
 

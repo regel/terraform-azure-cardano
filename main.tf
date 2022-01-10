@@ -105,4 +105,25 @@ module "containers" {
   prometheus_namespace               = "prometheus"
 }
 
+module "vault" {
+  # When using these modules in your own templates, you will need to use a Git URL with a ref attribute that pins you
+  # to a specific version of the modules, such as the following example:
+  # source = "git::git@github.com:regel/terraform-azure-cardano.git//modules/vault?ref=v0.0.1"
+  source = "./modules/vault"
+
+  vault_name           = var.vault_name
+  location             = var.location
+  resource_group_name  = var.vault_resource_group_name
+  tenant_id            = azurerm_client_config.current.tenant_id
+  allow_subnet_ids     = [data.module.cardano_cluster.user_subnet_id]
+  cluster_principal_id = data.module.cardano_cluster.cluster_principal_id
+  kubelet_principal_id = data.module.cardano_cluster.kubelet_principal_id
+  sku_name             = "standard"
+  allow_cidrs          = ["${chomp(data.http.myip.body)}/32"]
+  allow_azuread_group  = false
+}
+
+data "http" "myip" {
+  url = "http://ipv4.icanhazip.com"
+}
 
