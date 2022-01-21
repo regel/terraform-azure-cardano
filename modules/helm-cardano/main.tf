@@ -44,6 +44,29 @@ resource "helm_release" "prometheus" {
   create_namespace = true
 }
 
+# ---------------------------------------------------------------------------------------------------------------------
+# RENDER AND APPLY HELM VALUES
+# ---------------------------------------------------------------------------------------------------------------------
+
+data "template_file" "cardano-values" {
+  template = file("${path.module}/templates/cardano-values.tftpl")
+  vars = {
+    IMAGE_TAG               = var.cardano_image_version
+    ADMIN_IMAGE_TAG         = coalesce(var.cardano_admin_image_version, var.cardano_image_version)
+    METRICS_ENABLED         = var.prometheus_enabled ? "true" : ""
+    SERVICE_MONITOR_ENABLED = var.prometheus_enabled ? "true" : ""
+    PROMETHEUS_NAMESPACE    = var.prometheus_namespace
+    VAULT_CSI_ENABLED       = var.csi_secrets_store_provider_enabled ? "true" : ""
+    VAULT_NAME              = var.vault_name
+    VAULT_TENANT_ID         = var.tenant_id
+    VAULT_CSI_IDENTITY      = var.identity
+    DNS_LABEL_NAME          = var.dns_label_name
+    ENV                     = var.environment
+    PVC_SIZE                = var.pvc_size
+    PVC_SOURCE_ENABLED      = var.pvc_source_enabled ? "true" : ""
+    PVC_SOURCE_GUID         = var.pvc_source_guid
+  }
+}
 
 resource "helm_release" "cardano" {
   depends_on = [
@@ -60,58 +83,8 @@ resource "helm_release" "cardano" {
   wait             = false # do not wait for readiness
 
   values = [
-    <<EOF
-
-image:
-  tag: "${var.cardano_image_version}"
-
-admin:
-  tag: "${coalesce(var.cardano_admin_image_version, var.cardano_image_version)}"
-
-secrets:
-  redisUsername: "cardano"
-
-redis:
-  auth:
-    username: "cardano"
-
-metrics:
-  enabled: true
-  serviceMonitor:
-    enabled: "${var.prometheus_enabled ? true : false}"
-    namespace: "${var.prometheus_namespace}"
-
-vault:
-  csi:
-    enabled: "${var.csi_secrets_store_provider_enabled ? true : false}"
-    coldVaultName: "${var.vault_name}"
-    hotVaultName: "${var.vault_name}"
-    tenantId: "${var.tenant_id}"
-    userAssignedIdentityID: "${var.identity}"
-
-service:
-  beta.kubernetes.io/azure-dns-label-name: "${var.dns_label_name}"
-
-environment:
-  name: "${var.environment}"
-
-persistence:
-  enabled: true
-  # -- Provide an existing `PersistentVolumeClaim`, the value is evaluated as a template.
-  existingClaim:
-  mountPath: /data
-  # Starting in Kubernetes version 1.21, Kubernetes will use CSI drivers only and by default.
-  storageClass: "managed-csi"
-  accessModes:
-    - ReadWriteOnce
-  # -- PVC Storage Request for data volume
-  size: "${var.pvc_size}"
-  annotations: {}
-  selector: {}
-  sourceFile:
-    enabled: "${var.pvc_source_enabled ? true : false}"
-    guid: "${var.pvc_source_guid}"
-EOF
+    data.template_file.cardano-values.rendered,
+    var.extra_values
   ]
 
   set_sensitive {
@@ -123,3 +96,4 @@ EOF
     value = random_password.redis.result
   }
 }
+

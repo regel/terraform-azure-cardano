@@ -58,18 +58,27 @@ resource "azurerm_public_ip" "aks-ip" {
 }
 
 resource "azurerm_kubernetes_cluster" "cluster" {
-  name                    = var.cluster_name
-  location                = var.location
-  resource_group_name     = var.resource_group_name
-  dns_prefix              = format("%s-dns", var.domain_name_label)
-  kubernetes_version      = var.kubernetes_version
-  private_cluster_enabled = false
-  sku_tier                = "Paid"
+  name                            = var.cluster_name
+  location                        = var.location
+  resource_group_name             = var.resource_group_name
+  dns_prefix                      = format("%s-dns", var.domain_name_label)
+  kubernetes_version              = var.kubernetes_version
+  private_cluster_enabled         = false
+  sku_tier                        = "Paid"
+  api_server_authorized_ip_ranges = compact(var.allow_cidrs)
 
   default_node_pool {
-    name                         = "system"
-    node_count                   = var.system_node_pool_node_count
-    vm_size                      = var.system_node_pool_vm_size
+    name               = "system"
+    node_count         = var.system_node_pool_node_count
+    vm_size            = var.system_node_pool_vm_size
+    availability_zones = var.availability_zones
+    tags = merge(
+      {
+        Name = var.cluster_name
+      },
+      var.tags,
+    )
+    enable_host_encryption       = var.enable_host_encryption
     vnet_subnet_id               = azurerm_subnet.internal.id
     only_critical_addons_enabled = true # ["CriticalAddonsOnly=true:NoSchedule"]
     node_labels = {
@@ -133,11 +142,14 @@ resource "azurerm_kubernetes_cluster" "cluster" {
 
 
 resource "azurerm_kubernetes_cluster_node_pool" "user" {
-  name                  = "user"
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.cluster.id
-  node_count            = var.user_node_pool_node_count
-  vm_size               = var.user_node_pool_vm_size
-  vnet_subnet_id        = azurerm_subnet.user.id
+  name                   = "user"
+  kubernetes_cluster_id  = azurerm_kubernetes_cluster.cluster.id
+  node_count             = var.user_node_pool_node_count
+  vm_size                = var.user_node_pool_vm_size
+  vnet_subnet_id         = azurerm_subnet.user.id
+  availability_zones     = var.availability_zones
+  enable_host_encryption = var.enable_host_encryption
+
   tags = merge(
     {
       Name = var.cluster_name

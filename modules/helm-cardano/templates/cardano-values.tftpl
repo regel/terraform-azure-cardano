@@ -1,0 +1,49 @@
+image:
+  tag: "${IMAGE_TAG}"
+
+admin:
+  tag: "${ADMIN_IMAGE_TAG}"
+
+secrets:
+  redisUsername: "cardano"
+
+redis:
+  auth:
+    username: "cardano"
+
+metrics:
+  enabled: ${METRICS_ENABLED}
+  serviceMonitor:
+    enabled: ${SERVICE_MONITOR_ENABLED}
+    namespace: "${PROMETHEUS_NAMESPACE}"
+
+vault:
+  csi:
+    enabled: ${VAULT_CSI_ENABLED}
+    coldVaultName: "${VAULT_NAME}"
+    hotVaultName: "${VAULT_NAME}"
+    tenantId: "${VAULT_TENANT_ID}"
+    userAssignedIdentityID: "${VAULT_CSI_IDENTITY}"
+
+service:
+  beta.kubernetes.io/azure-dns-label-name: "${DNS_LABEL_NAME}"
+
+environment:
+  name: "${ENV}"
+
+persistence:
+  enabled: true
+  # -- Provide an existing `PersistentVolumeClaim`, the value is evaluated as a template.
+  existingClaim:
+  mountPath: /data
+  # Starting in Kubernetes version 1.21, Kubernetes will use CSI drivers only and by default.
+  storageClass: "managed-csi"
+  accessModes:
+    - ReadWriteOnce
+  # -- PVC Storage Request for data volume
+  size: "${PVC_SIZE}"
+  annotations: {}
+  selector: {}
+  sourceFile:
+    enabled: ${PVC_SOURCE_ENABLED}
+    guid: "${PVC_SOURCE_GUID}"

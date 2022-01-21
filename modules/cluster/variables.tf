@@ -24,6 +24,24 @@ variable "kubernetes_version" {
   default     = "1.21.2"
 }
 
+variable "availability_zones" {
+  type        = list(string)
+  description = "(Optional) A list of Availability Zones across which the Node Pool should be spread. Changing this forces a new resource to be created."
+  default     = []
+}
+
+variable "allow_cidrs" {
+  type        = list(string)
+  description = "One or more IP Addresses, or CIDR Blocks which should be able to access the Kubernetes API server."
+  default     = []
+}
+
+variable "enable_host_encryption" {
+  type        = bool
+  description = "(Optional) Should the nodes in this Node Pool have host encryption enabled? Defaults to true."
+  default     = true
+}
+
 variable "system_node_pool_node_count" {
   type        = number
   description = "The initial number of nodes which should exist in this Node Pool."

@@ -96,3 +96,9 @@ variable "prometheus_namespace" {
   description = "(Optional) The namespace to install the prometheus release into."
   default     = "prometheus"
 }
+
+variable "extra_values" {
+  type        = string
+  description = "(Optional) List of extra values in raw yaml to pass to helm during Cardano install."
+  default     = ""
+}

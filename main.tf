@@ -37,11 +37,21 @@ resource "random_string" "number" {
 resource "azurerm_resource_group" "rg" {
   name     = coalesce(var.resource_group_name, random_pet.example.id)
   location = var.location
+  tags = merge(
+    {
+      Name = var.resource_group_name
+    },
+    var.tags,
+  )
 }
 
 resource "tls_private_key" "id_rsa" {
   algorithm = "RSA"
   rsa_bits  = 4096
+}
+
+locals {
+  cluster_name = format("%s%s-cluster", var.env, random_string.number.id)
 }
 
 module "cardano_cluster" {
@@ -52,20 +62,20 @@ module "cardano_cluster" {
 
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  cluster_name        = format("%s%s-cluster", "testnet", random_string.number.id)
-  domain_name_label   = coalesce(var.domain_name_label, random_pet.example.id)
-  public_ssh_key      = tls_private_key.id_rsa.public_key_openssh
-  admin_username      = "azureuser"
-  kubernetes_version  = "1.21.2"
+  tags                = var.tags
+  availability_zones  = var.availability_zones
+  allow_cidrs         = []
+
+  cluster_name       = local.cluster_name
+  domain_name_label  = coalesce(var.domain_name_label, random_pet.example.id)
+  public_ssh_key     = tls_private_key.id_rsa.public_key_openssh
+  admin_username     = "azureuser"
+  kubernetes_version = "1.21.2"
 
   system_node_pool_node_count = 1
   system_node_pool_vm_size    = "Standard_DS2_v2"
   user_node_pool_node_count   = 1
   user_node_pool_vm_size      = "Standard_E4s_v4"
-
-  tags = {
-    Environment = "testnet"
-  }
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -79,20 +89,39 @@ module "containers" {
   source = "./modules/helm-cardano"
 
   release_name                       = coalesce(var.release_name, random_pet.example.id)
-  namespace                          = "testnet"
+  namespace                          = var.env
   tenant_id                          = data.azurerm_client_config.current.tenant_id
   dns_label_name                     = coalesce(var.domain_name_label, random_pet.example.id)
-  environment                        = "testnet"
-  pvc_size                           = "32Gi"
-  pvc_source_enabled                 = true
-  pvc_source_guid                    = "13ioPLPad3auIcBZgp5jJeukJcnq9_cTj"
-  cardano_helm_version               = "0.1.3"
-  cardano_image_version              = "1.30.1"
+  environment                        = var.env
+  pvc_size                           = var.pvc_size
+  pvc_source_enabled                 = var.pvc_source_enabled
+  pvc_source_guid                    = var.pvc_source_guid
+  cardano_helm_version               = var.cardano_helm_version
+  cardano_image_version              = var.cardano_image_version
   identity                           = module.cardano_cluster.kubelet_client_id
   csi_secrets_store_provider_enabled = true
   vault_name                         = var.vault_name
-  prometheus_enabled                 = true
+  prometheus_enabled                 = false
   prometheus_namespace               = "prometheus"
+
+  extra_values = yamlencode({
+    relay = {
+      resources = {
+        limits = {
+          cpu    = format("%s", var.max_cpu)
+          memory = format("%sGi", var.max_mem_gb)
+        }
+      }
+    }
+    producer = {
+      resources = {
+        limits = {
+          cpu    = format("%s", var.max_cpu)
+          memory = format("%sGi", var.max_mem_gb)
+        }
+      }
+    }
+  })
 }
 
 module "vault" {
