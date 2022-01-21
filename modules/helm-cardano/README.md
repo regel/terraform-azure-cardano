@@ -42,6 +42,7 @@ You can find the other parameters in [variables.tf](variables.tf).
 |------|---------|
 | <a name="provider_helm"></a> [helm](#provider\_helm) | n/a |
 | <a name="provider_random"></a> [random](#provider\_random) | n/a |
+| <a name="provider_template"></a> [template](#provider\_template) | n/a |
 
 ## Modules
 
@@ -55,6 +56,7 @@ No modules.
 | [helm_release.csi](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.prometheus](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [random_password.redis](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
+| [template_file.cardano-values](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
 
 ## Inputs
 
@@ -67,6 +69,7 @@ No modules.
 | <a name="input_csi_secrets_store_provider_version"></a> [csi\_secrets\_store\_provider\_version](#input\_csi\_secrets\_store\_provider\_version) | CSI driver release version. | `string` | `"1.0.0"` | no |
 | <a name="input_dns_label_name"></a> [dns\_label\_name](#input\_dns\_label\_name) | (Required) Set a public-facing DNS label of Cardano relays. This This publishes a fully qualified domain name for the Cardano service using Azure's public DNS servers and top-level domain. The annotation value must be unique within the Azure location, so it's recommended to use a sufficiently qualified label. Azure will then automatically append a default subnet, such as <location>.cloudapp.azure.com (where location is the region you selected), to the name you provide, to create the fully qualified DNS name. | `string` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | Name of the Cardano blockchain network. | `string` | `"testnet"` | no |
+| <a name="input_extra_values"></a> [extra\_values](#input\_extra\_values) | (Optional) List of extra values in raw yaml to pass to helm during Cardano install. | `string` | `""` | no |
 | <a name="input_identity"></a> [identity](#input\_identity) | Identifier of a user-assigned or system-assigned managed identity. | `string` | `null` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | (Optional) The namespace to install the release into. Defaults to cardano. | `string` | `"cardano"` | no |
 | <a name="input_prometheus_enabled"></a> [prometheus\_enabled](#input\_prometheus\_enabled) | Enable Helm Prometheus release. | `bool` | `true` | no |

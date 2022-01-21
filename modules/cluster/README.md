@@ -62,8 +62,11 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_admin_username"></a> [admin\_username](#input\_admin\_username) | (Required) The Admin Username for the Cluster. Changing this forces a new resource to be created. | `string` | n/a | yes |
+| <a name="input_allow_cidrs"></a> [allow\_cidrs](#input\_allow\_cidrs) | One or more IP Addresses, or CIDR Blocks which should be able to access the Kubernetes API server. | `list(string)` | `[]` | no |
+| <a name="input_availability_zones"></a> [availability\_zones](#input\_availability\_zones) | (Optional) A list of Availability Zones across which the Node Pool should be spread. Changing this forces a new resource to be created. | `list(string)` | `[]` | no |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | (Required) The name of the Managed Kubernetes Cluster to create. Changing this forces a new resource to be created. | `string` | n/a | yes |
 | <a name="input_domain_name_label"></a> [domain\_name\_label](#input\_domain\_name\_label) | DNS prefix specified when creating the managed cluster. | `string` | n/a | yes |
+| <a name="input_enable_host_encryption"></a> [enable\_host\_encryption](#input\_enable\_host\_encryption) | (Optional) Should the nodes in this Node Pool have host encryption enabled? Defaults to true. | `bool` | `true` | no |
 | <a name="input_enable_log_analytics_workspace"></a> [enable\_log\_analytics\_workspace](#input\_enable\_log\_analytics\_workspace) | (Optional) Enables Log Analytics Workspace which the OMS Agent should send data to. | `bool` | `false` | no |
 | <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | (Optional) Version of Kubernetes specified when creating the AKS managed cluster. If not specified, the latest recommended version will be used at provisioning time (but won't auto-upgrade). | `string` | `"1.21.2"` | no |
 | <a name="input_location"></a> [location](#input\_location) | (Required) Specifies the supported Azure location where the resource exists. Changing this forces a new resource to be created. | `string` | n/a | yes |
@@ -82,6 +85,7 @@ No modules.
 | <a name="output_cluster_principal_id"></a> [cluster\_principal\_id](#output\_cluster\_principal\_id) | The principal id of the system assigned identity which is used by main components. |
 | <a name="output_fqdn"></a> [fqdn](#output\_fqdn) | n/a |
 | <a name="output_kube_config"></a> [kube\_config](#output\_kube\_config) | A kube\_config block |
+| <a name="output_kube_config_raw"></a> [kube\_config\_raw](#output\_kube\_config\_raw) | n/a |
 | <a name="output_kubelet_client_id"></a> [kubelet\_client\_id](#output\_kubelet\_client\_id) | The Client ID of the user-defined Managed Identity to be assigned to the Kubelets. |
 | <a name="output_kubelet_principal_id"></a> [kubelet\_principal\_id](#output\_kubelet\_principal\_id) | The Object ID of the user-defined Managed Identity assigned to the Kubelets. |
 | <a name="output_public_ip"></a> [public\_ip](#output\_public\_ip) | n/a |
