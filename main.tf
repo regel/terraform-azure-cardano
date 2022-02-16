@@ -95,7 +95,7 @@ module "containers" {
   environment                        = var.env
   pvc_size                           = var.pvc_size
   pvc_source_enabled                 = var.pvc_source_enabled
-  pvc_source_guid                    = var.pvc_source_guid
+  pvc_source_url                     = var.pvc_source_url
   cardano_helm_version               = var.cardano_helm_version
   cardano_image_version              = var.cardano_image_version
   identity                           = module.cardano_cluster.kubelet_client_id
@@ -103,6 +103,7 @@ module "containers" {
   vault_name                         = var.vault_name
   prometheus_enabled                 = false
   prometheus_namespace               = "prometheus"
+  kube_config_raw                    = module.cardano_cluster.kube_config_raw
 
   extra_values = yamlencode({
     relay = {

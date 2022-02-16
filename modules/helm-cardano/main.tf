@@ -45,6 +45,39 @@ resource "helm_release" "prometheus" {
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
+# RENDER AND APPLY KUBERNETES CRDs
+# ---------------------------------------------------------------------------------------------------------------------
+
+locals {
+  redis_auth_name = "${var.namespace}-auth"
+}
+
+data "template_file" "redis-auth" {
+  template = file("${path.module}/templates/redis-auth.tftpl")
+  vars = {
+    NAME     = local.redis_auth_name
+    PASSWORD = base64encode(random_password.redis.result)
+  }
+}
+
+resource "null_resource" "redis-auth" {
+  triggers = {
+    manifest_sha1 = "${sha1("${data.template_file.redis-auth.rendered}")}"
+  }
+
+  provisioner "local-exec" {
+    working_dir = path.module
+    command     = "bash crd.sh"
+    interpreter = ["/bin/bash", "-c"]
+    environment = {
+      KUBECONFIG_RAW = base64encode(var.kube_config_raw)
+      MANIFEST_RAW   = base64encode(data.template_file.redis-auth.rendered)
+      NAMESPACE      = var.namespace
+    }
+  }
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
 # RENDER AND APPLY HELM VALUES
 # ---------------------------------------------------------------------------------------------------------------------
 
@@ -64,13 +97,15 @@ data "template_file" "cardano-values" {
     ENV                     = var.environment
     PVC_SIZE                = var.pvc_size
     PVC_SOURCE_ENABLED      = var.pvc_source_enabled ? "true" : ""
-    PVC_SOURCE_GUID         = var.pvc_source_guid
+    PVC_SOURCE_URL          = var.pvc_source_url
+    REDIS_EXISTING_SECRET   = local.redis_auth_name
   }
 }
 
 resource "helm_release" "cardano" {
   depends_on = [
     helm_release.csi,
+    null_resource.redis-auth,
   ]
 
   name             = var.release_name
@@ -87,13 +122,5 @@ resource "helm_release" "cardano" {
     var.extra_values
   ]
 
-  set_sensitive {
-    name  = "secrets.redisPassword"
-    value = random_password.redis.result
-  }
-  set_sensitive {
-    name  = "redis.auth.password"
-    value = random_password.redis.result
-  }
 }
 

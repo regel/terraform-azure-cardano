@@ -4,12 +4,9 @@ image:
 admin:
   tag: "${ADMIN_IMAGE_TAG}"
 
-secrets:
-  redisUsername: "cardano"
-
 redis:
   auth:
-    username: "cardano"
+    existingSecret: "${REDIS_EXISTING_SECRET}"
 
 metrics:
   enabled: ${METRICS_ENABLED}
@@ -46,4 +43,4 @@ persistence:
   selector: {}
   sourceFile:
     enabled: ${PVC_SOURCE_ENABLED}
-    guid: "${PVC_SOURCE_GUID}"
+    url: "${PVC_SOURCE_URL}"

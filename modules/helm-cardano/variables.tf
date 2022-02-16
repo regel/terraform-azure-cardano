@@ -34,15 +34,15 @@ variable "pvc_source_enabled" {
   description = "Restore blockchain data using the given data source reference."
   default     = false
 }
-variable "pvc_source_guid" {
+variable "pvc_source_url" {
   type        = string
-  description = "Identifier of the Google Drive file containing a tar.gz dump of Cardano blockchain data."
+  description = "Url of a tar.gz archive that contains Cardano blockchain database."
   default     = ""
 }
 variable "cardano_helm_version" {
   type        = string
   description = "The Cardano Helm release version to use. See https://github.com/regel/cardano-charts"
-  default     = "0.1.3"
+  default     = "0.3.0"
 }
 variable "cardano_image_version" {
   type        = string
@@ -53,6 +53,12 @@ variable "cardano_admin_image_version" {
   type        = string
   description = "Docker image tag to use for Cardano admin pod."
   default     = "1.30.1"
+}
+
+variable "kube_config_raw" {
+  type        = string
+  description = "A kube_config raw block"
+  sensitive   = true
 }
 
 variable "identity" {
