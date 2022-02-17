@@ -20,6 +20,10 @@ sponsor](https://opencollective.com/gh-regel#sponsor)]
 
 Cardano hodlers can send donations to this wallet address: `addr1q973kf48y9vxqareqvxr7flacx3pl3rz0m9lmwt4nej0zr99dw6mre74f2g48nntw5ar6mz58fm09sk70e0k4vgmkess27g47n`
 
+## Demo
+
+![terraform apply](./recording/render1645136043643-min.gif)
+
 ## How to use this Module
 
 This repo has the following folder structure:
