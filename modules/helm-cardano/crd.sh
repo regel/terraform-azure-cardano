@@ -27,4 +27,5 @@ MANIFEST=$(mktemp)
 trap "rm -f $KUBECONFIG $MANIFEST" EXIT ;
 echo $KUBECONFIG_RAW | base64 --decode > $KUBECONFIG
 echo $MANIFEST_RAW | base64 --decode > $MANIFEST
+kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f - ; 
 kubectl apply --namespace $NAMESPACE -f $MANIFEST
