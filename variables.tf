@@ -25,6 +25,7 @@ variable "vault_resource_group_name" {
 variable "env" {
   type        = string
   description = "(Required) Environment name: 'testnet' or 'mainnet'"
+  default     = "testnet"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -95,7 +96,7 @@ variable "cardano_helm_version" {
 variable "cardano_image_version" {
   type        = string
   description = "Docker image tag to use for Cardano producer and relay pods."
-  default     = "1.30.1"
+  default     = "1.35.4"
 }
 
 variable "pvc_size" {
@@ -110,9 +111,9 @@ variable "pvc_source_enabled" {
   default     = false
 }
 
-variable "pvc_source_guid" {
+variable "pvc_source_url" {
   type        = string
-  description = "Identifier of the Google Drive file containing a tar.gz dump of Cardano blockchain data."
+  description = "URL of a tar.lz4 snapshot of Cardano blockchain data."
   default     = ""
 }
 

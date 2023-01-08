@@ -4,10 +4,6 @@ image:
 admin:
   tag: "${ADMIN_IMAGE_TAG}"
 
-redis:
-  auth:
-    existingSecret: "${REDIS_EXISTING_SECRET}"
-
 metrics:
   enabled: ${METRICS_ENABLED}
   serviceMonitor:

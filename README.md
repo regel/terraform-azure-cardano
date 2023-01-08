@@ -62,3 +62,20 @@ along with the changelog, in the [Releases Page](../../releases).
 
 During initial development, the major version will be 0 (e.g., `0.x.y`), which indicates the code does not yet have a 
 stable API. 
+
+## How do I find the Blockchain snapshot
+
+Cardano blockchain snapshots are updated daily. The URL of the snapshot can be set in `pvc_source_url` variable. 
+
+testnet:
+
+```
+echo $(curl -s https://downloads.csnapshots.io/snapshots/testnet/testnet-db-snapshot.json| jq -r .[].file_name ) 
+```
+
+mainnet:
+
+```
+echo $(curl -s https://downloads.csnapshots.io/snapshots/mainnet/mainnet-db-snapshot.json| jq -r .[].file_name ) 
+```
+

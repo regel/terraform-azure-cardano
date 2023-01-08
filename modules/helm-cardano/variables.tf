@@ -47,12 +47,12 @@ variable "cardano_helm_version" {
 variable "cardano_image_version" {
   type        = string
   description = "Docker image tag to use for Cardano producer and relay pods."
-  default     = "1.30.1"
+  default     = "1.35.4"
 }
 variable "cardano_admin_image_version" {
   type        = string
   description = "Docker image tag to use for Cardano admin pod."
-  default     = "1.30.1"
+  default     = "1.35.4"
 }
 
 variable "kube_config_raw" {
@@ -70,7 +70,7 @@ variable "identity" {
 variable "csi_secrets_store_provider_version" {
   type        = string
   description = "CSI driver release version."
-  default     = "1.0.0"
+  default     = "1.4.0"
 }
 
 variable "csi_secrets_store_provider_enabled" {

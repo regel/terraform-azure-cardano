@@ -9,17 +9,11 @@ terraform {
   required_version = ">= 0.12.26"
 }
 
-resource "random_password" "redis" {
-  length           = 24
-  special          = true
-  override_special = "_%@"
-}
-
 resource "helm_release" "csi" {
   count = var.csi_secrets_store_provider_enabled ? 1 : 0
 
   name             = "csi-secrets-store-provider-azure"
-  repository       = "https://raw.githubusercontent.com/Azure/secrets-store-csi-driver-provider-azure/master/charts"
+  repository       = "https://azure.github.io/secrets-store-csi-driver-provider-azure/charts"
   chart            = "csi-secrets-store-provider-azure"
   version          = var.csi_secrets_store_provider_version
   lint             = true
@@ -48,34 +42,6 @@ resource "helm_release" "prometheus" {
 # RENDER AND APPLY KUBERNETES CRDs
 # ---------------------------------------------------------------------------------------------------------------------
 
-locals {
-  redis_auth_name = "${var.namespace}-auth"
-}
-
-data "template_file" "redis-auth" {
-  template = file("${path.module}/templates/redis-auth.tftpl")
-  vars = {
-    NAME     = local.redis_auth_name
-    PASSWORD = base64encode(random_password.redis.result)
-  }
-}
-
-resource "null_resource" "redis-auth" {
-  triggers = {
-    manifest_sha1 = "${sha1("${data.template_file.redis-auth.rendered}")}"
-  }
-
-  provisioner "local-exec" {
-    working_dir = path.module
-    command     = "bash crd.sh"
-    interpreter = ["/bin/bash", "-c"]
-    environment = {
-      KUBECONFIG_RAW = base64encode(var.kube_config_raw)
-      MANIFEST_RAW   = base64encode(data.template_file.redis-auth.rendered)
-      NAMESPACE      = var.namespace
-    }
-  }
-}
 
 # ---------------------------------------------------------------------------------------------------------------------
 # RENDER AND APPLY HELM VALUES
@@ -98,14 +64,12 @@ data "template_file" "cardano-values" {
     PVC_SIZE                = var.pvc_size
     PVC_SOURCE_ENABLED      = var.pvc_source_enabled ? "true" : ""
     PVC_SOURCE_URL          = var.pvc_source_url
-    REDIS_EXISTING_SECRET   = local.redis_auth_name
   }
 }
 
 resource "helm_release" "cardano" {
   depends_on = [
     helm_release.csi,
-    null_resource.redis-auth,
   ]
 
   name             = var.release_name

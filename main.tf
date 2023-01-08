@@ -12,8 +12,41 @@ terraform {
   # 0.14.0 as the minimum version, as that version added support for validation and the alltrue function
   # Removing the validation completely will yield a version compatible with 0.12.26 as that added support for
   # required_providers with source URLs
-  required_version = ">= 0.14.0"
+  required_version = ">= 0.12.26"
+  required_providers {
+    azurerm = {
+      version = "=2.83.0"
+    }
+    helm       = {}
+    kubernetes = {}
+  }
 }
+
+provider "azurerm" {
+  features {
+    key_vault {
+      purge_soft_delete_on_destroy = true
+    }
+  }
+}
+
+provider "kubernetes" {
+  host                   = module.cardano_cluster.kube_config.0.host
+  token                  = module.cardano_cluster.kube_config.0.password
+  client_certificate     = base64decode(module.cardano_cluster.kube_config.0.client_certificate)
+  client_key             = base64decode(module.cardano_cluster.kube_config.0.client_key)
+  cluster_ca_certificate = base64decode(module.cardano_cluster.kube_config.0.cluster_ca_certificate)
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = module.cardano_cluster.kube_config.0.host
+    client_certificate     = base64decode(module.cardano_cluster.kube_config.0.client_certificate)
+    client_key             = base64decode(module.cardano_cluster.kube_config.0.client_key)
+    cluster_ca_certificate = base64decode(module.cardano_cluster.kube_config.0.cluster_ca_certificate)
+  }
+}
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # AUTOMATICALLY LOOK UP THE ACTIVE AZURE SUBSCRIPTION
@@ -70,12 +103,12 @@ module "cardano_cluster" {
   domain_name_label  = coalesce(var.domain_name_label, random_pet.example.id)
   public_ssh_key     = tls_private_key.id_rsa.public_key_openssh
   admin_username     = "azureuser"
-  kubernetes_version = "1.21.2"
+  kubernetes_version = "1.24.6"
 
   system_node_pool_node_count = 1
   system_node_pool_vm_size    = "Standard_DS2_v2"
   user_node_pool_node_count   = 1
-  user_node_pool_vm_size      = "Standard_E4s_v4"
+  user_node_pool_vm_size      = "Standard_DS2_v2"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
